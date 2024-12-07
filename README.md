@@ -20,6 +20,10 @@ A FastAPI-based service for generating speech from text using the Coqui TTS libr
 pip install -r requirements.txt
 ```
 
+#### Install espeak TTS backend
+##### Ubuntu
+`sudo apt install espeak`
+
 ### Run the application
 ```bash
 uvicorn app.main:app --reload
@@ -30,17 +34,10 @@ Single and multispeaker models. Voice conversion models are not supported yet.
 
 ## API Endpoints
 ### POST /tts
-Converts text to speech audio.
 ```
-{
-  "model": {name of coqui model}
-  "input": "Hello, world!",
-  "voice": "default",
-  "response_format": "mp3"
-}
-
+curl -X POST http://localhost:8000/tts \
+    -H "Content-Type: Application/json" \
+    -d '{"model": "tts_models/en/vctk/vits", "voice": "p273", "response_format": "wav", "input": "Hello world!"}' \
+    --output audio.wav
 ```
-
-Response:
-
-Streamed audio data in the specified format.
+Returns a streaming audio file in the specified format.
