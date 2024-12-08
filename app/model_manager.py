@@ -22,7 +22,12 @@ class ModelManager:
             return self.models[model_name]
         
         device = "cuda" if torch.cuda.is_available() else "cpu"
-        model = TTS(model_name).to(device)
+        
+        try:
+            model = TTS(model_name).to(device)
+        except Exception as e:
+            raise e
+        
         self.models[model_name] = model
         return model
 
