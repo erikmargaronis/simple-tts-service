@@ -12,7 +12,20 @@ media_type_mapping = {
 }
 
 def encode_pcm(data) -> np.ndarray:
-    """Convert waveform data to PCM format."""
+    """
+    Convert waveform data to PCM (Pulse Code Modulation) format.
+
+    Args:
+        data (list or np.ndarray): Input waveform data, expected to be a list or NumPy array 
+            of floating-point values.
+
+    Returns:
+        np.ndarray: Normalized waveform data converted to 16-bit PCM format.
+
+    Raises:
+        ValueError: If the input audio data contains only silence (maximum absolute value is 0).
+    """
+    
     audio_np = np.array(data, dtype=np.float32)
     max_val = np.max(np.abs(audio_np))
     if max_val == 0:

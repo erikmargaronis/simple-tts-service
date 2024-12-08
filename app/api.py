@@ -12,8 +12,18 @@ from model_manager import model_manager
 executor = ThreadPoolExecutor(max_workers=4)
 tts_router = APIRouter()
 
-async def run_tts(text: str, voice_id: str, model_name: str) -> list:
-    """Generate speech waveform for the given text, voice ID, and model."""
+async def run_tts(text: str, voice_id: str, model_name: str) -> list[float]:
+    """
+    Asynchronously generate speech waveform for the given text, voice ID, and model.
+
+    Args:
+        text (str): The input text to be converted into speech.
+        voice_id (str): The identifier for the speaker/voice.
+        model_name (str): The name of the TTS model to be used.
+
+    Returns:
+        list (float): Generated speech waveform data.
+    """
     tts_model = model_manager.get_model(model_name)
     loop = asyncio.get_running_loop()
 
@@ -30,7 +40,7 @@ async def run_tts(text: str, voice_id: str, model_name: str) -> list:
     return waveform
 
 @tts_router.post("/tts", response_class=StreamingResponse, summary="Text-to-Speech Endpoint")
-async def tts(request: TTSRequest):
+async def tts(request: TTSRequest) -> StreamingResponse:
     """
     Convert input text to speech audio in the specified format.
 
@@ -50,7 +60,6 @@ async def tts(request: TTSRequest):
             detail=f"Unrecognizable model name {request.model}"
         )
 
-    # Generate waveform
     data = await run_tts(request.input, request.voice, request.model)
 
     if request.response_format not in media_type_mapping:
@@ -59,7 +68,6 @@ async def tts(request: TTSRequest):
             detail=f"Unsupported format '{request.response_format}'. Supported formats: {list(media_type_mapping.keys())}."
         )
 
-    # Encode data
     encoded_data = encode_data(data, request.response_format)
     media_type = media_type_mapping.get(request.response_format, "application/octet-stream")
 
